@@ -1,0 +1,17 @@
+1、Redis官网下载redis-5.0.3.tar.gz
+
+2、复制到Linux /app 下
+
+3、进入/app解压Redis，命令 tar zxvf redis-5.0.3.tar.gz
+
+4、cd redis-5.0.3 进入解压后的文件夹 ，执行 make 指令
+
+5、mkdir /usr/local/redis 目录，cp redis-cli redis-sever /usr/local/redis 复制两个文件过去
+
+6、cp redis.conf /usr/local/redis 再复制一个配置文件过去。
+
+7、前端启动Redis：进入/usr/local/redis ，./redis-server 启动Redis（不推荐）
+
+8、后端启动Redis： vim /usr/local/redis/redis.conf 修改redis.conf里的daemonize no 改为 yes。再进入/usr/local/redis， ./redis-server redis.conf 指令后端启动Redis,输入 ./redis-cli进入redis控制台
+
+9、查看Redis服务状态：ps -A | grep redis

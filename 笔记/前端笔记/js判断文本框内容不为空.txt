@@ -1,0 +1,21 @@
+
+js判断输入框不能有空格或null值的实现方法
+var sno = $('#sno').val();
+   var sname = $('#sname').val();
+   if((sno.indexOf(" ") >= 0 || sno == null) || (sname.indexOf(" ") >= 0 || sname == null)){
+       alert('学号和名称不能为空格或null值');
+       return;
+   }else{
+   }
+
+
+js判断字符串是否为空，是否都是空格的判断语句
+var username = $("#username").val();
+
+if(username == "" || username == undefined || username == null || (username.length>0 && username.trim().length == 0)){
+
+                alert("请填写用户名！")
+
+            } 
+
+

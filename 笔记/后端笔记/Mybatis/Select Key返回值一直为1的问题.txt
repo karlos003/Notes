@@ -1,0 +1,46 @@
+ mybatis中使用selectKey，返回结果一直是1
+
+mybatis中使用selectKey，返回结果一直是1，结合这个问题，笔记一下selectKey标签以及问题的原因
+
+先说需求，向数据库插入一条记录，表的id是自增的，插入以后返回插入记录的id
+
+下面是xml文件中的插入的sql
+复制代码
+
+1 <insert id="insertCompete" parameterType="CompetesWithBLOBs">
+2      insert into competes(compete_title,compete_about,compete_integral,issue_date)
+3      values(#{competeTitle},#{competeAbout},#{competeIntegral},#{issueDate})
+4         
+5     <selectKey keyColumn="compete_id" keyProperty="competeId" order="AFTER"
+6    　　resultType="int">
+7       select last_insert_id()
+8     </selectKey>
+9 </insert>
+
+复制代码
+
+上面插入的内容就不说了，直接说<selectKey>
+
+keyColumn：插入数据以后，要返回的内容在数据表中对应的字段名称(这里返回的是插入记录的id(对应数据表中的名称为compete_id))
+
+keyProperty：指定返回的id映射到bean中的哪个属性(这里是competeId)，这个bean对应的类的名称就是上面insert标签中的属性parameterType的值，
+
+order=”AFTER”：表示这个selectKey语句的执行是在insert语句之后
+
+resultType：selectKey语句返回值的类型，我这里是int类型
+
+ 
+
+下面说一下为什么执行这个sql后，一直返回1，而不是我们期望的id，先看一下调用代码
+
+1 Integer result = competesMapperCustom.insertCompete(compete);
+2 Integer competeId = compete.getCompeteId();
+
+我插入数据时插入的是一个bean,这个bean的类型就是上面我们提到的parameterType的值，插入前它的id是空，
+
+当我们执行插入后，返回插入的结果result，插入成功result=1，插入失败result=0,这就是为什么结果一直为1了，因为返回的结果根本不是我们需要的id，返回的id其实已经映射到了我们插入的bean中，我们只要通过它的get方法就可以得到了：compete.getCompeteId();
+
+嘴笨，有点啰嗦了！
+
+ 
+初学小白，请多指教！

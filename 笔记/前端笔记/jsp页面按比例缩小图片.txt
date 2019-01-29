@@ -1,0 +1,44 @@
+
+一、有时真正的图片过大，后台显示的时候会影响布局，所以在加载图片的时候要等比压缩，这样才能是jsp页面布局协调
+
+    <%@ page language="java" contentType="text/html; charset=UTF-8"
+        pageEncoding="UTF-8"%>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+    <html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>图片压缩</title>
+    <script type="text/javascript">
+    	function AutoResizeImage(maxWidth,maxHeight,objImg){
+    		var img= new Image();
+    		img.src=objImg.src;//定义一个图片对象
+    		var hRatio;
+    		var wRatio;
+    		var Ratio=1;
+    		var w=img.width;//图片的宽
+    		var h=img.height;//图片的长
+    		wRatio=maxWidth/w;//宽压缩的比例
+    		hRatio=maxHeight/h;//长压缩的比例
+    		if(wRatio==0&&hRatio==0){
+    			Ratio=1;//如果压缩最大值都为零，按原图比例压缩
+    		}else if(wRatio==0){
+    			if(hRatio<1)Ratio=hRatio;//如果宽为零，长的比例小于一的情况按长比例压缩
+    		}else if(hRatio==0){
+    			if(wRatio<1)Ratio=wRatio;//如果长的压缩最大值为零，宽的比例小于一的情况按宽压缩
+    		}else if(wRatio<1&&hRatio<1){
+    			Ratio=(wRatio<hRatio?wRatio:hRatio);//如果长宽最大压缩值都不为零，取比例的最小值
+    		}
+    		if(Ratio<1){
+    			w=w*Ratio;
+    			h=h*Ratio;
+    		}
+    		//赋值
+    		objImg.height=h;
+    		objImg.width=w;
+    	}
+    </script>
+    </head>
+    <body>
+    	<img src="http://10.58.178.81:8888/test5/upload/img/party1.png" onload="AutoResizeImage(50,60,this);" alt="1024*946"/>
+    </body>
+    </html>

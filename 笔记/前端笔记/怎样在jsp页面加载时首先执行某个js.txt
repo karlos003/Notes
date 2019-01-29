@@ -1,0 +1,23 @@
+一般有两种做法
+
+1 
+
+此方法是光标停留在用户名上
+
+function init(){ 
+var ctrl=document.getElementById("loginName"); 
+ctrl.focus(); 
+}
+
+window.onload = function() {
+      init()；
+
+
+    }
+
+2<body onload="init()">
+--------------------- 
+作者：零下忆度 
+来源：CSDN 
+原文：https://blog.csdn.net/sinat_30474567/article/details/72764703 
+版权声明：本文为博主原创文章，转载请附上博文链接！

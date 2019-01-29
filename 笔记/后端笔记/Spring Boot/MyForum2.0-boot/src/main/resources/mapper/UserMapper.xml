@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ltq.mapper.UserMapper">
+
+	<!-- 增 -->
+	
+	<insert id="addUser" parameterType="org.ltq.entity.User">
+		insert into user(account,pwd,name) value(#{account},#{pwd},#{name})
+	</insert> 
+	
+	<!-- 删 -->
+	
+	<!-- 改 -->
+	
+	<update id="updateUserPhotoByAccount" parameterType="org.ltq.entity.User">
+		update user set user_photo = #{user_photo} where account = #{account}
+	</update>
+	
+	<update id="updateUserPwdByAccount" parameterType="org.ltq.entity.User">
+		update user set pwd = #{pwd} where account = #{account}
+	</update>
+	
+	<!-- 查 -->
+	<select id="queryUserCountByAccount" parameterType="String" resultType="int">
+		select count(1) from user where account = #{account}
+	</select>
+	
+	<select id="queryUserByAccount" parameterType="String" resultMap="userMapping">
+		select account,pwd,name,user_photo from user where account = #{account}
+	</select>
+	
+	<select id="queryUserPhotoCountByAccount" parameterType="String" resultType="int">
+		select count(user_photo) from user where account = #{account}
+	</select>
+	
+	<select id="queryUserPwdByAccount" parameterType="String" resultType="String">
+		select pwd from user where account = #{account}
+	</select>
+
+	<!-- resultMap -->
+
+	<resultMap type="org.ltq.entity.User" id="userMapping">
+		<id property="account" column="account"/>
+		<result property="pwd" column="pwd"/>
+		<result property="name" column="name"/>
+		<result property="user_photo" column="user_photo"/>
+	</resultMap>
+		
+</mapper>

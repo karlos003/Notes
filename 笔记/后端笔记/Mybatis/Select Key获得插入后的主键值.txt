@@ -1,0 +1,216 @@
+mybatis学习之路----insert主键返回 selectKey使用
+
+
+
+有时候新增一条数据，知道新增成功即可，但是有时候，需要这条新增数据的主键，以便逻辑使用，再将其查询出来明显不符合要求，效率也变低了。
+
+这时候，通过一些设置，mybatis可以将insert的数据的主键返回，直接拿到新增数据的主键，以便后续使用。
+
+这里主要说的是selectKey标签
+
+设计表的时候有两种主键，一种自增主键，一般为int类型，一种为非自增的主键，例如用uuid等。
+
+首先说自增类型的主键。
+
+1  映射xml中添加如下代码，注释写的很清楚了，不多做赘述。
+
+
+    <!--新增信息，并拿到新增信息的表主键信息。
+        新增数据，得到主键的外层写法没什么特别，跟普通的insert一样。只不过里面加了selectKey-->
+    <insert id="insertAndgetkey" parameterType="com.soft.mybatis.model.User">
+        <!--selectKey  会将 SELECT LAST_INSERT_ID()的结果放入到传入的model的主键里面，
+            keyProperty 对应的model中的主键的属性名，这里是 user 中的id，因为它跟数据库的主键对应
+            order AFTER 表示 SELECT LAST_INSERT_ID() 在insert执行之后执行,多用与自增主键，
+                  BEFORE 表示 SELECT LAST_INSERT_ID() 在insert执行之前执行，这样的话就拿不到主键了，
+                        这种适合那种主键不是自增的类型
+            resultType 主键类型 -->
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into t_user (username,password,create_date) values(#{username},#{password},#{createDate})
+    </insert>
+2 接口 UserDao
+    /**
+     * 新增用户信息，并得到新增数据的主键
+     *      主键自增
+     * @return
+     */
+    int insertAndGeyKey(User user);
+
+3 实现类 UserDaoImpl
+
+    public int insertAndGeyKey(User user) {
+        SqlSession sqlSession = null;
+        try {
+            sqlSession = SqlsessionUtil.getSqlSession();
+            int key =  sqlSession.insert("test.insertAndgetkey",user);
+            // commit
+            sqlSession.commit();
+            return key;
+        } catch (Exception e) {
+            sqlSession.rollback();
+            e.printStackTrace();
+        } finally {
+            SqlsessionUtil.closeSession(sqlSession);
+        }
+        return 0;
+    }
+接下来就是测试了，
+UserDaoTest
+
+    /**
+     * 注意，user.xml中已经说过，selectKey会将得到的主键放入model的主键属性中，
+     * 所以这里获取主键的方法一定是通过model.get主键才能获取新增的主键
+     * @throws Exception
+     */
+    @Test
+    public void insertAndGeyKey() throws Exception {
+        User user = new User();
+        user.setUsername("新增得到主键5");
+        user.setPassword("123456");
+        user.setCreateDate(new Date());
+        int  result = dao.insertAndGeyKey(user);
+        System.out.println("insertAndGeyKey :" + result);
+        // 获取新增数据主键
+        System.out.println("新增数据的主键 :" + user.getId());
+    }
+数据库表新增数据主键为 34 
+
+
+
+junit测试结果  得到主键 34  测试成功。
+
+
+
+
+
+2 自增主键的获取方法，说完了，下面来讲讲非自增主键的获取方法。大致一样，些许不同。
+
+由于只有一张表，这里又新建了一张表，对应的xml，别忘了将新建的xml添加到sqlMapConfig.xml中。
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace命名空间，有种java package的感觉，sql隔离,这个名字必须唯一
+并且不能省略不写也不能为空，不过名字倒是可以随意，只要不跟另外一个文件中的名字一样即可-->
+<mapper namespace="customer">
+ 
+    <!-- 跟普通的insert没有什么不同的地方 -->
+    <insert id="insert" parameterType="com.soft.mybatis.model.Customer">
+        <!-- 跟自增主键方式相比，这里的不同之处只有两点
+                    1  insert语句需要写id字段了，并且 values里面也不能省略
+                    2 selectKey 的order属性需要写成BEFORE 因为这样才能将生成的uuid主键放入到model中，
+                    这样后面的insert的values里面的id才不会获取为空
+              跟自增主键相比就这点区别，当然了这里的获取主键id的方式为 select uuid()
+              当然也可以另写别生成函数。-->
+        <selectKey keyProperty="id" order="BEFORE" resultType="String">
+            select uuid()
+        </selectKey>
+        insert into t_customer (id,c_name,c_sex,c_ceroNo,c_ceroType,c_age)
+        values (#{id},#{name},#{sex},#{ceroNo},#{ceroType},#{age})
+    </insert>
+</mapper>
+
+接口  CustomerDao
+
+package com.soft.mybatis.dao;
+ 
+import com.soft.mybatis.model.Customer;
+ 
+/**
+ * Created by xuweiwei on 2017/9/10.
+ */
+public interface CustomerDao {
+ 
+    int add(Customer customer);
+}
+实现类 CustomerDaoImpl
+
+package com.soft.mybatis.dao.impl;
+ 
+import com.soft.mybatis.Util.SqlsessionUtil;
+import com.soft.mybatis.dao.CustomerDao;
+import com.soft.mybatis.model.Customer;
+import org.apache.ibatis.session.SqlSession;
+ 
+/**
+ * Created by xuweiwei on 2017/9/10.
+ */
+public class CustomerDaoImpl implements CustomerDao {
+ 
+    public int add(Customer customer) {
+        SqlSession sqlSession = null;
+        try {
+            sqlSession = SqlsessionUtil.getSqlSession();
+            int key =  sqlSession.insert("customer.insert", customer);
+            // commit
+            sqlSession.commit();
+            return key;
+        } catch (Exception e) {
+            sqlSession.rollback();
+            e.printStackTrace();
+        } finally {
+            SqlsessionUtil.closeSession(sqlSession);
+        }
+        return 0;
+    }
+}
+准备工作完毕，下面进行测试。
+执行前的数据 
+
+
+
+测试类  CustomerDaoImplTest
+
+
+package com.soft.mybatis.dao.impl;
+ 
+import com.soft.mybatis.dao.CustomerDao;
+import com.soft.mybatis.model.Customer;
+import org.junit.Test;
+ 
+import static org.junit.Assert.*;
+ 
+/**
+ * Created by xuweiwei on 2017/9/10.
+ */
+public class CustomerDaoImplTest {
+    private CustomerDao customerDao = new CustomerDaoImpl();
+ 
+    @Test
+    public void add() throws Exception {
+        Customer customer = new Customer();
+        customer.setName("全球鹰1");
+        customer.setAge(15);
+        customer.setCeroNo("888888888888");
+        customer.setCeroType(2);
+        customer.setSex(1);
+        int result = customerDao.add(customer);
+        System.out.println("插入结果 ： "+result);
+        System.out.println("插入主键id ： "+customer.getId());
+    }
+ 
+}
+测试结果
+
+数据库
+
+
+
+可以看到新增的数据的主键已经获取到了。
+
+注意点：获取主键，一定要从穿进去的model中获取。
+
+附  新增customer表的建表ddl
+
+
+CREATE TABLE `t_customer` (
+  `id` varchar(50) NOT NULL,
+  `c_name` varchar(20) DEFAULT NULL COMMENT '姓名',
+  `c_sex` tinyint(4) DEFAULT NULL COMMENT '性别',
+  `c_ceroNo` varchar(18) DEFAULT NULL COMMENT '证件号码',
+  `c_ceroType` tinyint(4) DEFAULT NULL COMMENT '1 身份证 2其他',
+  `c_age` int(3) DEFAULT NULL COMMENT '年龄',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8

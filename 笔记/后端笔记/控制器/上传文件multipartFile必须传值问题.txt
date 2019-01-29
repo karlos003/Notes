@@ -1,0 +1,11 @@
+SpringMVC中MultipartFile参数如果不上传文件报错的问题
+
+
+做项目的时候遇到啦这个问题，就是在方法参数中接收MultipartFile multipartFile 参数时如果不传文件会报错，搞来搞去怎么都搞不定，百度都百度一下午了还是没找到答案，想死的心都有了，后来灵机一动，我不在方法当参数接收，我换一个思路试试，于是有了下面的方法：
+
+MultipartFile multipartFile = null;
+        boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+        if (isMultipart){ 
+            MultipartHttpServletRequest multipartRequest = WebUtils.getNativeRequest(request, MultipartHttpServletRequest.class);
+            multipartFile = multipartRequest.getFile("multipartFile");
+        }

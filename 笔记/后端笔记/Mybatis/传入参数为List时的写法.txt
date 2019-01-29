@@ -1,0 +1,26 @@
+ mybatis中传入一个List集合作为查询条件的参数
+
+如果有一个查询参数有多个，用一个List集合传进去，这个mapper文件可以这么写
+
+　　
+
+
+<select id="queryList04" resultType="map" parameterType="java.util.List">
+          select CEZJRC_TXLJ,CEZJRC_XM,CEZJRC_ZY,CEZJRC_ZC from NRJRENCAI 
+          where CEZJRC_BM in 
+          <foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+            #{item}  
+        </foreach>
+  </select>
+
+
+
+其中<foreach>这个标签是用来循环传入的集合的，collection="list"这个参数中有list，map两种，还有就是自定义的参数，item="item"这个参数可以自定义，用来循环集合里面的值，这个参数的取名要和下面#（）这个里面的取名一致。
+
+parameterType="java.util.List"这个传入的参数类型必须这么写，不能简写成List，参数的返回类型也需要明确。
+下面是Dao层的调用示例
+　　
+
+public List<Map> queryList04(List list4);
+
+这样就可以实现传入一个list集合作为参数。

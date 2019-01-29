@@ -1,0 +1,6 @@
+@charset "UTF-8";
+body {
+	background: url("../images/bg2.jpg");
+	background-size: 85%;
+	background-position: top;
+}

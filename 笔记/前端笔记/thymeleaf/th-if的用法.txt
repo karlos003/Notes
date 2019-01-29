@@ -1,0 +1,29 @@
+thymeleaf th:if 判断表达式
+2018年01月13日 16:36:42 LoveEmperor_王子様 阅读数：59593
+版权声明：本文为博主原创文章，未经博主允许不得转载。 https://blog.csdn.net/qq_31424825/article/details/79052192
+
+作者：LoveEmperor-王子様
+
+thymeleaf 判断表达式注意：
+
+        gt：great than（大于）>
+        ge：great equal（大于等于）>=
+        eq：equal（等于）==
+        lt：less than（小于）<
+        le：less equal（小于等于）<=
+        ne：not equal（不等于）!=
+
+    这里以th:if为例，其他差不多
+
+     用法：  例     th:if="${xx} lt 'x'"  <-----------> xx < x  
+
+        <div th:if=" ${userCarSize} lt '3'">
+          <div class="addList">
+            <p>
+               <a id="gotobindView">
+                    <span class="icon"></span>添加绑定
+                </a>
+            </p>
+           <p>最多绑定三辆车</p>
+            </div>
+        </div>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ltq.mapper.PostMapper">
+
+	<!-- 增 -->
+	
+	<insert id="addPost" parameterType="org.ltq.entity.Post">
+		insert into post(post_type,post_title,post_content,user_account,user_name,post_time,post_image) values(#{post_type},#{post_title},#{post_content},#{user_account},#{user_name},#{post_time},#{post_image})
+	</insert>
+	
+	<!-- 删 -->
+	
+	<!-- 改 -->
+	
+	<!-- 查 -->
+	
+	<select id="selectPostIdByAccountAndTime" resultType="java.math.BigInteger">
+		select post_id from post where user_account = #{user_account} and post_time = #{post_time}
+	</select>
+	
+	<select id="queryPostInfoByTypeOrdByTime" parameterType="String" resultMap="postMapping">
+		select post_id,post_type,post_title,user_account,user_name,post_time,post_likeNum,post_subscribeNum,post_viewNum from post where post_type = #{post_type} order by post_time
+	</select>
+	
+	<!-- resultMap -->
+	
+	<resultMap type="org.ltq.entity.Post" id="postMapping">
+		<id property="post_id" column="post_id"/>
+		<result property="post_type" column="post_type"/>
+		<result property="post_title" column="post_title"/>
+		<result property="post_content" column="post_content"/>
+		<result property="user_account" column="user_account"/>
+		<result property="user_name" column="user_name"/>
+		<result property="post_time" column="post_time"/>
+		<result property="post_image" column="post_image"/>
+		<result property="post_likeNum" column="post_likeNum"/>
+		<result property="post_subscribeNum" column="post_subscribeNum"/>
+		<result property="post_viewNum" column="post_viewNum"/>
+	</resultMap>
+	
+</mapper>
