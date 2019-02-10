@@ -1,0 +1,43 @@
+创建自动更新的 timestamp （插入或修改时 uptime都会自动更新）
+
+CREATE TABLE `hello` (
+`id` int(11) NOT NULL,
+`uptime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+KEY `line_id` (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3526391 DEFAULT CHARSET=utf8
+
+ 
+
+修改为不自动更新（只是插入是自动生成当前时间）
+
+alter table hello change uptime uptime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+show create table hello；
+
+CREATE TABLE `hello` (
+`id` int(11) NOT NULL,
+`uptime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+KEY `line_id` (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3526391 DEFAULT CHARSET=utf8
+
+再修改为自动更新：
+
+alter table hello change uptime uptime timestamp 
+
+show create table hello；
+
+CREATE TABLE `hello` (
+`id` int(11) NOT NULL,
+`uptime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+KEY `line_id` (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3526391 DEFAULT CHARSET=utf8
+
+ 
+
+ 
+
+mysql 有修改默认值的方法
+
+alter table table_name alter column column_name set default xxx;
+
+此方法适用于一般类型的字段，却无法修改timestamp ，修改时总是报错，网上搜索关于修改timestamp 自动更新的方法，没有找到，经自己尝试用上面方法可以修改。
